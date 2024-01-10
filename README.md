@@ -2,6 +2,17 @@
 
 Simple application that will match logos with TV programmes provided by you.
 
+### NOTE!
+This may **NOT** be 100% accurate.
+
+### Based on
+- urllib
+- pathlib
+- difflib
+- [m3u8](https://github.com/globocom/m3u8)
+- re
+- os
+
 ### Usage
 ```bash
 python3 <path-to-script> -u "<logos URL>" -m "<m3u URL/path>"
