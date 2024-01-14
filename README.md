@@ -1,6 +1,6 @@
 ## M3U Logo Matcher
 
-Simple application that will match logos with TV programmes provided by you.
+Simple script that will match logos with TV programmes provided by you.
 
 ### NOTE!
 This may **NOT** be 100% accurate.
@@ -9,7 +9,7 @@ This may **NOT** be 100% accurate.
 - urllib
 - pathlib
 - difflib
-- [m3u8](https://github.com/globocom/m3u8)
+- [ipytv](https://github.com/Beer4Ever83/ipytv)
 - re
 - os
 
@@ -26,7 +26,7 @@ Any that display logos as a file tree. A good example is [this provider](http://
 ![Alt text](image.png)
 
 ### Result
-When everything is done, result is written in **result_\<m3u-file-name\>.txt** file, in m3u parent directory.
+When everything is done, playlist file is **OVERWRITTEN**!
 
 ### Example usage
 ```bash
