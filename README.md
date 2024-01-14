@@ -15,7 +15,7 @@ This may **NOT** be 100% accurate.
 
 ### Usage
 ```bash
-python3 <path-to-script> -u "<logos URL>" -m "<m3u URL/path>"
+python3 <path-to-script> -u "<logos URL>" -m "<m3u URL/path>" (-r <ratio>)
 ```
 
 ### Supported logo providers
@@ -30,10 +30,11 @@ When everything is done, playlist file is **OVERWRITTEN**!
 
 ### Example usage
 ```bash
-python3 <path-to-script> -u "http://epg.ovh/logo" -m "m3u_list.m3u"
+python3 <path-to-script> -u "http://epg.ovh/logo" -m "m3u_list.m3u" -r 0.7
 ```
 
 ### Available parameters
 - -u/--url - logos source URL
 - -m/--m3u - URL/absolute path to m3u
 - -v/--verbose - enable verbose mode
+- -r/--ratio - customize similarity ratio

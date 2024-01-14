@@ -15,11 +15,15 @@ def debug(message: str):
     
     if verbose:
         print("[M3U-LOGO-MATCHER:DEBUG] " + message)
-        
+     
+def cutoff_extension(path: str):
+    return path[:path.rfind(".")]
+   
 def parse_arguments():
     parser = ArgumentParser()
     parser.add_argument("-u", "--url", dest="url", help="URL to logos", required=True)
     parser.add_argument("-m", "--m3u", dest="m3u", help="Path to m3u file", required=True, type=Path)
+    parser.add_argument("-r", "--ratio", dest="ratio", help="Similarity ratio", default=0.6, type=float)
     parser.add_argument("-v", "--verbose", dest="verbose", help="Verbose output", action="store_true")
     
     return parser.parse_args()
@@ -33,7 +37,7 @@ def fetch_logos(base_logo_url: str):
         # Get logo names
         for logo in re.findall(r'<a href="(.+\..+)">(.*\..+)</a>', data):
             logo_url, channel_name = logo
-            yield f"{base_logo_url}/{logo_url}", channel_name
+            yield f"{base_logo_url}/{logo_url}", cutoff_extension(channel_name)
             
 def process(arguments):
     debug("Processing...")
@@ -43,12 +47,21 @@ def process(arguments):
         print("No logos found! Ensure that the URL is correct and it returns a list of logo resources.")
         return
     
+    if arguments.ratio > 1 or arguments.ratio < 0:
+        print("Ratio must be between 0 and 1.")
+        return
+    
     # Get m3u data
     debug(f"Loading m3u file {arguments.m3u}...")
     playlist = tv_playlist.loadf(str(arguments.m3u))
     debug(f"Loaded {playlist.length()} channels")
     
-    matched_logos = list(match_similar_logos(logos, get_channels(playlist)))
+    matched_logos = list(match_similar_logos(
+        logos = logos, 
+        channels = get_channels(playlist),
+        ratio = arguments.ratio
+    ))
+    
     debug(f"Matched {len(matched_logos)}/{playlist.length()} logos.")
     debug(f"Missing logos: {playlist.length() - len(matched_logos)}")
     
@@ -93,33 +106,32 @@ def save_result(
     print("File overwritten.")
     print("Thank you for using this script!")
             
-def match_similar_logos(logos: list[tuple[str, str]], channels: list[str]):
+def match_similar_logos(
+    logos: list[tuple[str, str]], 
+    channels: list[str],
+    ratio: float = 0.6
+):
     debug("Matching logos...")
+
+    best_score = {}
+    best_match = {}
     
     for channel in channels:
         debug(f"Matching channel {channel}...")
         
-        matched = False
-        match_score = 0
-        
         for logo in logos:
-            if matched:
-                break
+            debug(f"Trying logo {logo[0]}...")
             
             logo_url, channel_name = logo
             score = get_similarity_ratio(channel, channel_name)
             
-            if score > match_score:
-                match_score = score
-                
-            if match_score > 0.5:
-                debug(f"Matched {channel} with {logo_url} (ratio: {match_score})")
-                matched = True
-                yield (channel, logo_url)
-            
-        if not matched:
-            debug(f"No match for {channel}")
-            continue
+            if score > best_score.get(channel, 0) and score > ratio:
+                best_score[channel] = score
+                best_match[channel] = logo_url
+    else:
+        for channel, logo_url in best_match.items():
+            debug(f"Matched {channel} with {logo_url} (ratio: {best_score[channel]})")
+            yield (channel, logo_url)
         
 def get_channels(playlist: tv_playlist.M3UPlaylist):
     for channel in playlist:
