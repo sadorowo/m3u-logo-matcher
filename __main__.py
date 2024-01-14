@@ -126,7 +126,7 @@ def get_channels(playlist: tv_playlist.M3UPlaylist):
         yield channel.name
         
 def get_similarity_ratio(a: str, b: str):
-    return SequenceMatcher(None, a, b).ratio()
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
 
 if __name__ == "__main__":
     debug("Starting...")
