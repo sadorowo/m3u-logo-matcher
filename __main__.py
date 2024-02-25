@@ -100,7 +100,7 @@ def save_result(
     input_path: str, 
     playlist: tv_playlist.M3UPlaylist
 ):
-    with open(input_path, "w+") as f:
+    with open(input_path, "w+", encoding="utf-8") as f:
         f.write(playlist.to_m3u_plus_playlist())
     
     print("File overwritten.")
